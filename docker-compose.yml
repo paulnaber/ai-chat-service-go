@@ -1,80 +1,80 @@
 version: '3.8'
 
 services:
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: ai-chat-api
-    restart: unless-stopped
-    ports:
-      - "${SERVER_PORT:-3000}:3000"
-    depends_on:
-      - postgres
-      - keycloak
-    environment:
-      - ENVIRONMENT=${ENVIRONMENT:-development}
-      - SERVER_PORT=3000
-      - DB_HOST=postgres
-      - DB_PORT=5432
-      - DB_USER=${DB_USER:-postgres}
-      - DB_PASSWORD=${DB_PASSWORD:-postgres}
-      - DB_NAME=${DB_NAME:-aichat}
-      - DB_SSLMODE=${DB_SSLMODE:-disable}
-      - DB_MIGRATION_DIR=/app/migrations
-      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS:-*}
-      - KEYCLOAK_URL=http://keycloak:8080
-      - KEYCLOAK_REALM=${KEYCLOAK_REALM:-ai-chat}
-      - KEYCLOAK_CLIENT_ID=${KEYCLOAK_CLIENT_ID:-ai-chat-client}
-      - KEYCLOAK_CLIENT_SECRET=${KEYCLOAK_CLIENT_SECRET}
-      - KEYCLOAK_PUBLIC_KEY=${KEYCLOAK_PUBLIC_KEY}
-    volumes:
-      - ./migrations:/app/migrations
-    networks:
-      - ai-chat-network
+    # app:
+    #   build:
+    #     context: .
+    #     dockerfile: Dockerfile
+    #   container_name: ai-chat-api
+    #   restart: unless-stopped
+    #   ports:
+    #     - "${SERVER_PORT:-3000}:3000"
+    #   depends_on:
+    #     - postgres
+    #     - keycloak
+    #   environment:
+    #     - ENVIRONMENT=${ENVIRONMENT:-development}
+    #     - SERVER_PORT=3000
+    #     - DB_HOST=postgres
+    #     - DB_PORT=5432
+    #     - DB_USER=${DB_USER:-postgres}
+    #     - DB_PASSWORD=${DB_PASSWORD:-postgres}
+    #     - DB_NAME=${DB_NAME:-aichat}
+    #     - DB_SSLMODE=${DB_SSLMODE:-disable}
+    #     - DB_MIGRATION_DIR=/app/migrations
+    #     - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS:-*}
+    #     - KEYCLOAK_URL=http://keycloak:8080
+    #     - KEYCLOAK_REALM=${KEYCLOAK_REALM:-ai-chat}
+    #     - KEYCLOAK_CLIENT_ID=${KEYCLOAK_CLIENT_ID:-ai-chat-client}
+    #     - KEYCLOAK_CLIENT_SECRET=${KEYCLOAK_CLIENT_SECRET}
+    #     - KEYCLOAK_PUBLIC_KEY=${KEYCLOAK_PUBLIC_KEY}
+    #   volumes:
+    #     - ./migrations:/app/migrations
+    #   networks:
+    #     - ai-chat-network
 
-  postgres:
-    image: postgres:15-alpine
-    container_name: ai-chat-db
-    restart: unless-stopped
-    environment:
-      - POSTGRES_USER=${DB_USER:-postgres}
-      - POSTGRES_PASSWORD=${DB_PASSWORD:-postgres}
-      - POSTGRES_DB=${DB_NAME:-aichat}
-    ports:
-      - "${DB_PORT:-5432}:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - ai-chat-network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+    postgres:
+        image: postgres:15-alpine
+        container_name: ai-chat-db
+        restart: unless-stopped
+        environment:
+            - POSTGRES_USER=${DB_USER:-postgres}
+            - POSTGRES_PASSWORD=${DB_PASSWORD:-postgres}
+            - POSTGRES_DB=${DB_NAME:-aichat}
+        ports:
+            - '${DB_PORT:-5432}:5432'
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+        networks:
+            - ai-chat-network
+        healthcheck:
+            test: ['CMD-SHELL', 'pg_isready -U postgres']
+            interval: 10s
+            timeout: 5s
+            retries: 5
 
-  keycloak:
-    image: quay.io/keycloak/keycloak:latest
-    container_name: ai-chat-keycloak
-    restart: unless-stopped
-    environment:
-      - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN:-admin}
-      - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD:-admin}
-      - KC_DB=postgres
-      - KC_DB_URL=jdbc:postgresql://postgres:5432/${KEYCLOAK_DB:-keycloak}
-      - KC_DB_USERNAME=${DB_USER:-postgres}
-      - KC_DB_PASSWORD=${DB_PASSWORD:-postgres}
-    ports:
-      - "${KEYCLOAK_PORT:-8080}:8080"
-    depends_on:
-      - postgres
-    command: ["start-dev"]
-    networks:
-      - ai-chat-network
+    keycloak:
+        image: quay.io/keycloak/keycloak:latest
+        container_name: ai-chat-keycloak
+        restart: unless-stopped
+        environment:
+            - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN:-admin}
+            - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD:-admin}
+            - KC_DB=postgres
+            - KC_DB_URL=jdbc:postgresql://postgres:5432/${KEYCLOAK_DB:-keycloak}
+            - KC_DB_USERNAME=${DB_USER:-postgres}
+            - KC_DB_PASSWORD=${DB_PASSWORD:-postgres}
+        ports:
+            - '${KEYCLOAK_PORT:-8080}:8080'
+        depends_on:
+            - postgres
+        command: ['start-dev']
+        networks:
+            - ai-chat-network
 
 volumes:
-  postgres_data:
+    postgres_data:
 
 networks:
-  ai-chat-network:
-    driver: bridge
+    ai-chat-network:
+        driver: bridge

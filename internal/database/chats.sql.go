@@ -19,16 +19,16 @@ RETURNING id, title, user_email, last_active_date, created_at, updated_at
 `
 
 type CreateChatParams struct {
-	ID             uuid.UUID `json:"id"`
-	Title          string    `json:"title"`
-	UserEmail      string    `json:"user_email"`
-	LastActiveDate time.Time `json:"last_active_date"`
-	CreatedAt      time.Time `json:"created_at"`
-	UpdatedAt      time.Time `json:"updated_at"`
+	ID             uuid.UUID
+	Title          string
+	UserEmail      string
+	LastActiveDate time.Time
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
 }
 
 func (q *Queries) CreateChat(ctx context.Context, arg CreateChatParams) (Chat, error) {
-	row := q.queryRow(ctx, q.createChatStmt, createChat,
+	row := q.db.QueryRowContext(ctx, createChat,
 		arg.ID,
 		arg.Title,
 		arg.UserEmail,
@@ -54,7 +54,7 @@ WHERE id = $1 LIMIT 1
 `
 
 func (q *Queries) GetChat(ctx context.Context, id uuid.UUID) (Chat, error) {
-	row := q.queryRow(ctx, q.getChatStmt, getChat, id)
+	row := q.db.QueryRowContext(ctx, getChat, id)
 	var i Chat
 	err := row.Scan(
 		&i.ID,
@@ -74,12 +74,12 @@ ORDER BY last_active_date DESC
 `
 
 func (q *Queries) GetChatsByUserEmail(ctx context.Context, userEmail string) ([]Chat, error) {
-	rows, err := q.query(ctx, q.getChatsByUserEmailStmt, getChatsByUserEmail, userEmail)
+	rows, err := q.db.QueryContext(ctx, getChatsByUserEmail, userEmail)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	items := []Chat{}
+	var items []Chat
 	for rows.Next() {
 		var i Chat
 		if err := rows.Scan(
@@ -110,12 +110,12 @@ WHERE id = $1
 `
 
 type UpdateChatLastActiveParams struct {
-	ID             uuid.UUID `json:"id"`
-	LastActiveDate time.Time `json:"last_active_date"`
-	UpdatedAt      time.Time `json:"updated_at"`
+	ID             uuid.UUID
+	LastActiveDate time.Time
+	UpdatedAt      time.Time
 }
 
 func (q *Queries) UpdateChatLastActive(ctx context.Context, arg UpdateChatLastActiveParams) error {
-	_, err := q.exec(ctx, q.updateChatLastActiveStmt, updateChatLastActive, arg.ID, arg.LastActiveDate, arg.UpdatedAt)
+	_, err := q.db.ExecContext(ctx, updateChatLastActive, arg.ID, arg.LastActiveDate, arg.UpdatedAt)
 	return err
 }

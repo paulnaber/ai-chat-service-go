@@ -2,29 +2,30 @@
 //
 // HTTP API for the AI Chat Service
 //
-//     Schemes: http, https
-//     Host: localhost:3000
-//     BasePath: /
-//     Version: 1.0.0
-//     License: MIT http://opensource.org/licenses/MIT
-//     Contact: API Support <support@example.com>
+//	Schemes: http, https
+//	Host: localhost:3000
+//	BasePath: /
+//	Version: 1.0.0
+//	License: MIT http://opensource.org/licenses/MIT
+//	Contact: API Support <support@example.com>
 //
-//     Consumes:
-//     - application/json
+//	Consumes:
+//	- application/json
 //
-//     Produces:
-//     - application/json
+//	Produces:
+//	- application/json
 //
-//     SecurityDefinitions:
-//       BearerAuth:
-//         type: apiKey
-//         in: header
-//         name: Authorization
+//	SecurityDefinitions:
+//	  BearerAuth:
+//	    type: apiKey
+//	    in: header
+//	    name: Authorization
 //
 // swagger:meta
 package main
 
 import (
+	"database/sql"
 	"log"
 
 	"github.com/gofiber/fiber/v2"
@@ -36,7 +37,7 @@ import (
 	_ "ai-chat-service-go/docs/swagger" // Import swagger docs
 	"ai-chat-service-go/internal/api"
 	"ai-chat-service-go/internal/config"
-	"ai-chat-service-go/internal/db"
+	"ai-chat-service-go/internal/database"
 )
 
 func main() {
@@ -47,17 +48,11 @@ func main() {
 	}
 
 	// Initialize database connection
-	store, err := db.InitDB(cfg.Database)
+	dbConn, err := sql.Open("postgres", cfg.Database.GetConnectionString())
 	if err != nil {
-		log.Fatalf("Failed to connect to database: %v", err)
+		log.Fatalf("Error opening database: %s", err)
 	}
-	defer store.Close()
-
-	// Run database migrations
-	err = db.RunMigrations(cfg.Database)
-	if err != nil {
-		log.Fatalf("Failed to run database migrations: %v", err)
-	}
+	store := database.New(dbConn)
 
 	// Create a new Fiber app
 	app := fiber.New(fiber.Config{
@@ -67,13 +62,13 @@ func main() {
 	// Setup middleware
 	app.Use(recover.New())
 	app.Use(logger.New())
-	
+
 	// Configure CORS
 	corsConfig := cors.Config{
 		AllowMethods: "GET,POST,HEAD,PUT,DELETE,PATCH",
 		AllowHeaders: "Origin, Content-Type, Accept, Authorization",
 	}
-	
+
 	// Handle AllowCredentials and AllowOrigins correctly
 	if cfg.CORS.AllowedOrigins == "*" {
 		corsConfig.AllowOrigins = "*"
@@ -82,7 +77,7 @@ func main() {
 		corsConfig.AllowOrigins = cfg.CORS.AllowedOrigins // Expected to be comma-separated
 		corsConfig.AllowCredentials = true
 	}
-	
+
 	app.Use(cors.New(corsConfig))
 
 	// Setup Swagger

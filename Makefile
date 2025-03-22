@@ -4,7 +4,7 @@
 .DEFAULT_GOAL := help
 
 # Variables
-APP_NAME := ai-chat-service
+APP_NAME := ai-chat-service-go
 MIGRATION_DIR := ./migrations
 SWAGGER_DOCS := ./docs/swagger
 
@@ -65,9 +65,9 @@ swagger:
 	@swagger serve -F=swagger $(SWAGGER_DOCS)/swagger.json
 
 # Docker commands
-docker-build:
-	@echo "Building Docker image..."
-	@docker compose build
+docker-build-app:
+	@echo "Building Docker image of app only..."
+	@docker build -t $(APP_NAME) .
 
 docker-up:
 	@echo "Starting Docker services..."
@@ -97,7 +97,7 @@ help:
 	@echo "  migrate-status - Show migration status"
 	@echo "  sqlc           - Generate SQL code from query files"
 	@echo "  swagger        - Generate Swagger documentation"
-	@echo "  docker-build   - Build Docker image"
-	@echo "  docker-up      - Start Docker services"
-	@echo "  docker-down    - Stop Docker services"
+	@echo "  docker-build-app   - Build Docker image"
+	@echo "  docker-up      - Start Docker services (postgres, keycloak)"
+	@echo "  docker-down    - Stop Docker services (postgres, keycloak)"
 	@echo "  tools          - Install required development tools"

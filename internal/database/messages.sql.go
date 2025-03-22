@@ -19,16 +19,16 @@ RETURNING id, content, sender_type, chat_id, created_at, updated_at
 `
 
 type CreateMessageParams struct {
-	ID         uuid.UUID `json:"id"`
-	Content    string    `json:"content"`
-	SenderType string    `json:"sender_type"`
-	ChatID     uuid.UUID `json:"chat_id"`
-	CreatedAt  time.Time `json:"created_at"`
-	UpdatedAt  time.Time `json:"updated_at"`
+	ID         uuid.UUID
+	Content    string
+	SenderType string
+	ChatID     uuid.UUID
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
 }
 
 func (q *Queries) CreateMessage(ctx context.Context, arg CreateMessageParams) (Message, error) {
-	row := q.queryRow(ctx, q.createMessageStmt, createMessage,
+	row := q.db.QueryRowContext(ctx, createMessage,
 		arg.ID,
 		arg.Content,
 		arg.SenderType,
@@ -54,7 +54,7 @@ WHERE id = $1 LIMIT 1
 `
 
 func (q *Queries) GetMessage(ctx context.Context, id uuid.UUID) (Message, error) {
-	row := q.queryRow(ctx, q.getMessageStmt, getMessage, id)
+	row := q.db.QueryRowContext(ctx, getMessage, id)
 	var i Message
 	err := row.Scan(
 		&i.ID,
@@ -74,12 +74,12 @@ ORDER BY created_at ASC
 `
 
 func (q *Queries) GetMessagesByChatID(ctx context.Context, chatID uuid.UUID) ([]Message, error) {
-	rows, err := q.query(ctx, q.getMessagesByChatIDStmt, getMessagesByChatID, chatID)
+	rows, err := q.db.QueryContext(ctx, getMessagesByChatID, chatID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	items := []Message{}
+	var items []Message
 	for rows.Next() {
 		var i Message
 		if err := rows.Scan(

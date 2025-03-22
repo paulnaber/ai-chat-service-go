@@ -8,7 +8,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 
-	"ai-chat-service-go/internal/db"
+	"ai-chat-service-go/internal/database"
 	"ai-chat-service-go/internal/middleware"
 	"ai-chat-service-go/internal/models"
 )
@@ -34,14 +34,14 @@ func (h *ChatHandler) CreateChat(c *fiber.Ctx) error {
 	}
 
 	// Parse request body
-	var req models.CreateChatRequest
+	var req database.CreateChatParams
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(http.StatusBadRequest).JSON(models.NewValidationError("Invalid request body"))
 	}
 
 	// Validate request
 	if req.Content == "" {
-		return c.Status(http.StatusBadRequest).JSON(models.NewValidationError("Invalid request parameters", 
+		return c.Status(http.StatusBadRequest).JSON(models.NewValidationError("Invalid request parameters",
 			models.ErrorDetail{Field: "content", Value: "Content cannot be empty"}))
 	}
 

@@ -27,9 +27,6 @@ COPY --from=builder /app/main .
 # Copy migrations directory
 COPY migrations /app/migrations
 
-# Copy OpenAPI spec file
-COPY ai-chat-api.yml /app/docs/ai-chat-api.yml
-
 EXPOSE 3000
 
 # Command to run the application

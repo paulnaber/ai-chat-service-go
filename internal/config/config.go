@@ -30,6 +30,7 @@ type DatabaseConfig struct {
 	Name         string `envconfig:"DB_NAME" default:"aichat"`
 	SSLMode      string `envconfig:"DB_SSLMODE" default:"disable"`
 	MigrationDir string `envconfig:"DB_MIGRATION_DIR" default:"migrations"`
+	DatabaseUrl  string `envconfig:"DB_URL" default:"postgres://postgres:postgres@localhost:5432/chirpy?sslmode=disable"`
 }
 
 // GetConnectionString returns a PostgreSQL connection string

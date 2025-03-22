@@ -10,7 +10,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	
+
 	"ai-chat-service-go/internal/middleware"
 	"ai-chat-service-go/internal/models"
 )
@@ -113,16 +113,16 @@ func TestCreateChat(t *testing.T) {
 	app := fiber.New()
 	mockDB := new(MockDB)
 	mockTx := new(MockTx)
-	
+
 	// Setup expectations
 	mockDB.On("Begin").Return(mockTx, nil)
 	mockTx.On("Exec", mock.Anything, mock.Anything).Return(nil, nil).Times(2)
 	mockTx.On("Commit").Return(nil)
 	mockTx.On("Rollback").Return(nil)
-	
+
 	// Create handler
 	handler := NewChatHandler(mockDB)
-	
+
 	// Set up the router
 	app.Post("/chats", func(c *fiber.Ctx) error {
 		// Mock authenticated user
@@ -131,10 +131,10 @@ func TestCreateChat(t *testing.T) {
 			Name:  "Test User",
 		}
 		c.Locals(string(middleware.UserKey), userInfo)
-		
+
 		return handler.CreateChat(c)
 	})
-	
+
 	// Create test request
 	reqBody := CreateChatRequest{
 		Content: "How do I configure my device?",
@@ -142,14 +142,14 @@ func TestCreateChat(t *testing.T) {
 	jsonBody, _ := json.Marshal(reqBody)
 	req := httptest.NewRequest(http.MethodPost, "/chats", bytes.NewReader(jsonBody))
 	req.Header.Set("Content-Type", "application/json")
-	
+
 	// Execute request
 	resp, err := app.Test(req)
-	
+
 	// Assert
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
-	
+
 	// Verify response body
 	var respBody CreateChatResponse
 	err = json.NewDecoder(resp.Body).Decode(&respBody)
@@ -160,7 +160,7 @@ func TestCreateChat(t *testing.T) {
 	assert.NotEmpty(t, respBody.InitialMessage.ID)
 	assert.Equal(t, reqBody.Content, respBody.InitialMessage.Content)
 	assert.Equal(t, models.SenderTypeUser, respBody.InitialMessage.SenderType)
-	
+
 	// Verify expectations
 	mockDB.AssertExpectations(t)
 	mockTx.AssertExpectations(t)
