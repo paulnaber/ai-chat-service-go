@@ -1,0 +1,414 @@
+openapi: 3.0.3
+info:
+  title: ɅI API
+  version: "1.0"
+tags:
+  - name: Chats
+    description: Endpoints for managing user chat sessions
+  - name: Messages
+    description: Endpoints for sending and retrieving messages within chats
+paths:
+  /v1/chats:
+    post:
+      tags:
+        - Chats
+      summary: Create a new chat
+      description: Creates a new chat with the initial message content. User identity (email) is extracted from JWT token.
+      operationId: createChat
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - content
+              properties:
+                content:
+                  type: string
+                  description: Content of the first message to start the chat with
+            examples:
+              new-chat-message:
+                value:
+                  content: "How do I configure my device?"
+      responses:
+        "200":
+          description: Chat created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/ChatDTO"
+                  - type: object
+                    properties:
+                      initialMessage:
+                        $ref: "#/components/schemas/MessageDTO"
+              examples:
+                chat-created:
+                  value:
+                    id: "1"
+                    title: "How do I configure my device?"
+                    lastActiveDate: "2023-07-15T14:32:21Z"
+                    initialMessage:
+                      id: "1"
+                      content: "How do I configure my device?"
+                      senderType: "user"
+                      createdAt: "2023-07-15T14:32:21Z"
+                      chatId: "1"
+        "400":
+          description: Bad request - invalid input parameters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                validation-error:
+                  value:
+                    code: "VALIDATION_ERROR"
+                    message: "The request contains invalid parameters"
+                    details:
+                      - field: "content"
+                        value: "Content cannot be empty"
+        "401":
+          description: Unauthorized - invalid or missing JWT token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                unauthorized:
+                  value:
+                    code: "UNAUTHORIZED"
+                    message: "Authentication required"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                server-error:
+                  value:
+                    code: "SERVER_ERROR"
+                    message: "An unexpected error occurred"
+    get:
+      tags:
+        - Chats
+      summary: Get all chats for a user
+      description: Returns an array of chats owned by the user. User identity (email) is extracted from JWT token.
+      operationId: getChats
+      responses:
+        "200":
+          description: List of chats returned successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ChatDTO"
+              examples:
+                user-chats:
+                  value:
+                    - id: "1"
+                      title: "How do I configure my device?"
+                      lastActiveDate: "2023-07-15T14:32:21Z"
+                    - id: "2"
+                      title: "Is there a way to update the firmware remotely?"
+                      lastActiveDate: "2023-07-10T09:15:33Z"
+        "401":
+          description: Unauthorized - invalid or missing JWT token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                unauthorized:
+                  value:
+                    code: "UNAUTHORIZED"
+                    message: "Authentication required"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                server-error:
+                  value:
+                    code: "SERVER_ERROR"
+                    message: "An unexpected error occurred"
+  /v1/chats/{chatId}/messages:
+    post:
+      tags:
+        - Messages
+      summary: Create a new message
+      description: Creates a new message in a specific chat. User identity (email) is extracted from JWT token.
+      operationId: createMessage
+      parameters:
+        - name: chatId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the chat this message belongs to
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - content
+              properties:
+                content:
+                  type: string
+                  description: Content of the message
+            examples:
+              simple-message:
+                value:
+                  content: "How do I configure my device?"
+              question-message:
+                value:
+                  content: "Is there a way to update the firmware remotely?"
+      responses:
+        "200":
+          description: Message created successfully and response message returned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageDTO"
+              examples:
+                ai-response:
+                  value:
+                    id: "3"
+                    content: "To configure your device, please follow these steps: 1. Connect to the admin panel using the IP address 192.168.1.1. 2. Login with your administrator credentials. 3. Navigate to the 'Settings' tab. 4. Adjust your configuration as needed."
+                    senderType: "llm"
+                    createdAt: "2023-07-15T14:35:42Z"
+                    chatId: "1"
+        "400":
+          description: Bad request - invalid input parameters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                validation-error:
+                  value:
+                    code: "VALIDATION_ERROR"
+                    message: "The request contains invalid parameters"
+                    details:
+                      - field: "content"
+                        value: "Content cannot be empty"
+        "401":
+          description: Unauthorized - invalid or missing JWT token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                unauthorized:
+                  value:
+                    code: "UNAUTHORIZED"
+                    message: "Authentication required"
+        "403":
+          description: Forbidden - user does not have access to this chat
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                forbidden:
+                  value:
+                    code: "FORBIDDEN"
+                    message: "You do not have permission to access this chat"
+        "404":
+          description: Chat not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                chat-not-found:
+                  value:
+                    code: "RESOURCE_NOT_FOUND"
+                    message: "The requested chat could not be found"
+                    details:
+                      - field: "chatId"
+                        value: "5"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                server-error:
+                  value:
+                    code: "SERVER_ERROR"
+                    message: "An unexpected error occurred"
+    get:
+      tags:
+        - Messages
+      summary: Get all messages for a chat
+      description: Returns an array of messages for the specified chat. User identity (email) is extracted from JWT token.
+      operationId: getMessages
+      parameters:
+        - name: chatId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the chat whose messages to retrieve
+      responses:
+        "200":
+          description: List of messages returned successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MessageDTO"
+              examples:
+                chat-messages:
+                  value:
+                    - id: "1"
+                      content: "How do I configure my device?"
+                      senderType: "user"
+                      createdAt: "2023-07-15T14:32:21Z"
+                      chatId: "1"
+                    - id: "2"
+                      content: "To configure your device, please follow these steps: 1. Connect to the admin panel using the IP address 192.168.1.1. 2. Login with your administrator credentials. 3. Navigate to the 'Settings' tab. 4. Adjust your configuration as needed."
+                      senderType: "llm"
+                      createdAt: "2023-07-15T14:35:42Z"
+                      chatId: "1"
+                    - id: "3"
+                      content: "Thank you for the information. Where can I find my administrator credentials?"
+                      senderType: "user"
+                      createdAt: "2023-07-15T14:40:15Z"
+                      chatId: "1"
+        "400":
+          description: Bad request - invalid chat ID
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                validation-error:
+                  value:
+                    code: "VALIDATION_ERROR"
+                    message: "Invalid chat ID format"
+                    details:
+                      - field: "chatId"
+                        value: "Invalid format"
+        "401":
+          description: Unauthorized - invalid or missing JWT token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                unauthorized:
+                  value:
+                    code: "UNAUTHORIZED"
+                    message: "Authentication required"
+        "403":
+          description: Forbidden - user does not have access to this chat
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                forbidden:
+                  value:
+                    code: "FORBIDDEN"
+                    message: "You do not have permission to access this chat"
+        "404":
+          description: Chat not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                chat-not-found:
+                  value:
+                    code: "RESOURCE_NOT_FOUND"
+                    message: "The requested chat could not be found"
+                    details:
+                      - field: "chatId"
+                        value: "5"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                server-error:
+                  value:
+                    code: "SERVER_ERROR"
+                    message: "An unexpected error occurred"
+components:
+  schemas:
+    ChatDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the chat (auto-generated)
+        title:
+          type: string
+          description: Name of the chat (derived from first message)
+        lastActiveDate:
+          type: string
+          format: date-time
+          description: Date when the chat was last active
+    MessageDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the message (auto-generated)
+        content:
+          type: string
+          description: Content of the message
+        senderType:
+          type: string
+          enum: [user, backend, llm]
+          description: Type of sender (automatically set to 'user' for user messages)
+        createdAt:
+          type: string
+          format: date-time
+          description: Date when the message was created (auto-generated)
+        chatId:
+          type: string
+          description: Reference to the chat this message belongs to (auto-generated)
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          enum:
+            - VALIDATION_ERROR
+            - UNAUTHORIZED
+            - FORBIDDEN
+            - RESOURCE_NOT_FOUND
+            - SERVER_ERROR
+          description: Error code that identifies the error type
+        message:
+          type: string
+          description: Human-readable error description
+        details:
+          type: array
+          description: List of field-value pairs with additional error information
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+                description: The name of the field with an error
+              value:
+                type: string
+                description: The error message or problematic value for this field
