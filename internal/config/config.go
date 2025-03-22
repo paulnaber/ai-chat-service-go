@@ -1,8 +1,6 @@
 package config
 
 import (
-	"fmt"
-
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
 )
@@ -30,13 +28,7 @@ type DatabaseConfig struct {
 	Name         string `envconfig:"DB_NAME" default:"aichat"`
 	SSLMode      string `envconfig:"DB_SSLMODE" default:"disable"`
 	MigrationDir string `envconfig:"DB_MIGRATION_DIR" default:"migrations"`
-	DatabaseUrl  string `envconfig:"DB_URL" default:"postgres://postgres:postgres@localhost:5432/chirpy?sslmode=disable"`
-}
-
-// GetConnectionString returns a PostgreSQL connection string
-func (c DatabaseConfig) GetConnectionString() string {
-	return fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
-		c.Host, c.Port, c.User, c.Password, c.Name, c.SSLMode)
+	DatabaseUrl  string `envconfig:"DB_URL" default:"postgres://postgres:postgres@localhost:5432/aichat?sslmode=disable"`
 }
 
 // CORSConfig holds CORS configuration

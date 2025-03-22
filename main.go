@@ -26,6 +26,7 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 
 	"github.com/gofiber/fiber/v2"
@@ -38,6 +39,8 @@ import (
 	"ai-chat-service-go/internal/api"
 	"ai-chat-service-go/internal/config"
 	"ai-chat-service-go/internal/database"
+
+	_ "github.com/lib/pq"
 )
 
 func main() {
@@ -48,7 +51,8 @@ func main() {
 	}
 
 	// Initialize database connection
-	dbConn, err := sql.Open("postgres", cfg.Database.GetConnectionString())
+	dbConn, err := sql.Open("postgres", cfg.Database.DatabaseUrl)
+	fmt.Println(cfg.Database.DatabaseUrl)
 	if err != nil {
 		log.Fatalf("Error opening database: %s", err)
 	}

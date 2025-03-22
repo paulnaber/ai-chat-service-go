@@ -43,6 +43,17 @@ type UserInfo struct {
 	TokenExpiry time.Time
 }
 
+func MockUserInfo(email string, roles []string) UserInfo {
+	return UserInfo{
+		Email:       email,
+		Name:        email,
+		GivenName:   email,
+		FamilyName:  email,
+		Roles:       roles,
+		TokenExpiry: time.Now().Add(time.Hour * 24 * 7),
+	}
+}
+
 // Auth creates the authentication middleware
 func Auth(cfg config.AuthConfig) fiber.Handler {
 	return func(c *fiber.Ctx) error {
