@@ -1,50 +1,40 @@
 # AI Chat Service
 
-A microservice API for managing AI chat conversations. The service is built with Go, Fiber, PostgreSQL, and Keycloak for authentication.
+This project is an AI Chat Proxy Server that handles chat and message functionalities.
+The main focus of this project is the architecture. I want to compare it with other technologies and languages.
 
 ## Features
 
-- Create and manage chat sessions
-- Send messages and receive AI-generated responses
-- User authentication via OAuth2 with Keycloak
-- Swagger documentation (generated from code)
-- Dockerized setup with docker-compose
-- Database migrations using Goose
-- Type-safe SQL queries with sqlc
+-   Create and manage chat sessions
+-   Send messages and receive AI-generated responses
+-   User authentication via OAuth2 with Keycloak
+-   Swagger documentation (generated from code documentation)
+-   Dockerized setup with docker-compose
 
-## Project Structure
+## Features
 
-The project follows a clean architecture approach with separation of concerns:
+• Supports chat and message operations
+• OpenAPI documentation generated from code documentation
+• ~~Authentication with OAuth2 Provider~~
+• ~~Downloadable OpenAPI definition (as json)~~
+• Easy local setup with Docker Compose
 
-```
-├── cmd/              # Additional command-line tools
-│   └── migrate/      # Migration CLI tool
-├── docs/             # Documentation files
-│   └── swagger/      # Generated Swagger documentation
-├── internal/         # Internal packages
-│   ├── api/          # API handlers
-│   ├── config/       # Configuration
-│   ├── db/           # Database access
-│   │   ├── generated/# Generated SQL code (from sqlc)
-│   │   └── queries/  # SQL query files
-│   ├── middleware/   # HTTP middleware
-│   ├── models/       # Domain models
-│   ├── services/     # Business logic services
-│   └── utils/        # Utility functions
-├── migrations/       # Database migrations (SQL files)
-└── scripts/          # Utility scripts
-```
+## Tech Stack
+
+• Goose - Database migrations
+• sqlc - Type-safe SQL queries
+• Docker Compose - Simplified local database setup
+• Fiber - Fast and minimalist web framework
+• go-swagger - OpenAPI generation from code documentation
 
 ## Requirements
 
-- Go 1.20 or higher
-- Docker and Docker Compose (for local development)
-- PostgreSQL
-- Keycloak
-- Required tools (for development):
-  - Goose (database migrations)
-  - sqlc (SQL code generation)
-  - go-swagger (API documentation)
+-   Go 1.20 or higher
+-   Docker and Docker Compose (for local development)
+-   Required tools (for development):
+    -   Goose (database migrations)
+    -   sqlc (SQL code generation)
+    -   go-swagger (API documentation)
 
 ## Getting Started
 
@@ -73,9 +63,6 @@ The easiest way to get started is using Docker Compose, which will set up all th
 # Build and start all services
 make docker-build
 make docker-up
-
-# Check the logs
-docker compose logs -f
 
 # Stop the services
 make docker-down
@@ -124,9 +111,9 @@ If you're not using Docker, you'll need to set up Keycloak manually:
 1. Create a new realm called `ai-chat`
 2. Create a new client called `ai-chat-client`
 3. Configure the client:
-   - Set access type to `confidential`
-   - Enable `Service Accounts`
-   - Add redirect URIs for your frontend
+    - Set access type to `confidential`
+    - Enable `Service Accounts`
+    - Add redirect URIs for your frontend
 4. Get the client secret from the Credentials tab
 5. Add the client secret to your `.env` file
 
@@ -167,7 +154,7 @@ make migrate-status
 
 ### SQL Queries
 
-SQL queries are stored in `internal/db/queries/` and used to generate Go code with sqlc.
+SQL queries are stored in `sql/queries/` and used to generate Go code with sqlc.
 
 ```bash
 # Generate SQL code
@@ -182,10 +169,3 @@ API documentation is generated automatically from annotations in the code.
 # Generate Swagger documentation
 make swagger
 ```
-
-## API Endpoints
-
-- `POST /v1/chats` - Create a new chat
-- `GET /v1/chats` - Get all chats for authenticated user
-- `POST /v1/chats/{chatId}/messages` - Send a message to a chat
-- `GET /v1/chats/{chatId}/messages` - Get all messages in a chat
