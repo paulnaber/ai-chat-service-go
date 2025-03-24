@@ -3,6 +3,11 @@
 This project is an AI Chat Proxy Server that handles chat and message functionalities.
 The main focus of this project is the architecture. I want to compare it with other technologies and languages.
 
+## Other Languages and Technologies
+
+[AI Chat Proxy Server - Node.js](https://github.com/paulnaber/ai-chat-service-nodejs)
+Java...
+
 ## Features
 
 -   Create and manage chat sessions
