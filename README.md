@@ -149,4 +149,5 @@ http://localhost:3000/swagger-ui/
 - better logging
 - prometheus
 - auth, including roles
-- metrics
+- /metrics endpoint
+- /swagger-ui and /openapi endpoints
