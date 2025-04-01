@@ -36,7 +36,13 @@
         "operationId": "getChats",
         "responses": {
           "200": {
-            "$ref": "#/responses/ChatResponse"
+            "description": "ChatResponse",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ChatResponse"
+              }
+            }
           },
           "401": {
             "description": "ErrorResponse",
@@ -61,7 +67,10 @@
         "operationId": "createChat",
         "responses": {
           "200": {
-            "$ref": "#/responses/ChatWithMessageResponse"
+            "description": "ChatWithMessageResponse",
+            "schema": {
+              "$ref": "#/definitions/ChatWithMessageResponse"
+            }
           },
           "400": {
             "description": "ErrorResponse",
@@ -102,7 +111,13 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/responses/MessageResponse"
+            "description": "MessageResponse",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/MessageResponse"
+              }
+            }
           },
           "400": {
             "description": "ErrorResponse",
@@ -153,7 +168,10 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/responses/MessageResponse"
+            "description": "MessageResponse",
+            "schema": {
+              "$ref": "#/definitions/MessageResponse"
+            }
           },
           "400": {
             "description": "ErrorResponse",
@@ -190,6 +208,142 @@
     }
   },
   "definitions": {
+    "Chat": {
+      "description": "Chat represents a user's chat session",
+      "type": "object",
+      "properties": {
+        "createdAt": {
+          "description": "When the chat was created",
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "CreatedAt",
+          "example": "2023-07-15T14:32:21Z"
+        },
+        "id": {
+          "description": "The unique identifier for the chat",
+          "type": "string",
+          "x-go-name": "ID",
+          "example": "123e4567-e89b-12d3-a456-426614174000"
+        },
+        "lastActiveDate": {
+          "description": "When the chat was last active",
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "LastActiveDate",
+          "example": "2023-07-15T14:32:21Z"
+        },
+        "title": {
+          "description": "The title of the chat, derived from the first message",
+          "type": "string",
+          "x-go-name": "Title",
+          "example": "How do I configure my device?"
+        },
+        "updatedAt": {
+          "description": "When the chat was last updated",
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "UpdatedAt",
+          "example": "2023-07-15T14:35:42Z"
+        },
+        "userEmail": {
+          "description": "The email of the user who owns the chat",
+          "type": "string",
+          "x-go-name": "UserEmail",
+          "example": "user@example.com"
+        }
+      },
+      "x-go-package": "ai-chat-service-go/internal/models"
+    },
+    "ChatResponse": {
+      "description": "ChatResponse is the data transfer object for chats in API responses",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "The unique identifier for the chat",
+          "type": "string",
+          "x-go-name": "ID",
+          "example": "123e4567-e89b-12d3-a456-426614174000"
+        },
+        "lastActiveDate": {
+          "description": "When the chat was last active",
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "LastActiveDate",
+          "example": "2023-07-15T14:32:21Z"
+        },
+        "title": {
+          "description": "The title of the chat, derived from the first message",
+          "type": "string",
+          "x-go-name": "Title",
+          "example": "How do I configure my device?"
+        }
+      },
+      "x-go-package": "ai-chat-service-go/internal/models"
+    },
+    "ChatWithMessageResponse": {
+      "description": "ChatWithMessageResponse is the response for creating a chat",
+      "type": "object",
+      "required": [
+        "initialMessage"
+      ],
+      "properties": {
+        "id": {
+          "description": "The unique identifier for the chat",
+          "type": "string",
+          "x-go-name": "ID",
+          "example": "123e4567-e89b-12d3-a456-426614174000"
+        },
+        "initialMessage": {
+          "$ref": "#/definitions/MessageResponse"
+        },
+        "lastActiveDate": {
+          "description": "When the chat was last active",
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "LastActiveDate",
+          "example": "2023-07-15T14:32:21Z"
+        },
+        "title": {
+          "description": "The title of the chat, derived from the first message",
+          "type": "string",
+          "x-go-name": "Title",
+          "example": "How do I configure my device?"
+        }
+      },
+      "x-go-package": "ai-chat-service-go/internal/models"
+    },
+    "CreateChatRequest": {
+      "description": "CreateChatRequest is the request body for creating a chat",
+      "type": "object",
+      "required": [
+        "content"
+      ],
+      "properties": {
+        "content": {
+          "description": "The content of the first message to start the chat with",
+          "type": "string",
+          "x-go-name": "Content",
+          "example": "How do I configure my device?"
+        }
+      },
+      "x-go-package": "ai-chat-service-go/internal/models"
+    },
+    "CreateMessageRequest": {
+      "description": "CreateMessageRequest is the request body for creating a message",
+      "type": "object",
+      "required": [
+        "content"
+      ],
+      "properties": {
+        "content": {
+          "description": "The content of the message",
+          "type": "string",
+          "x-go-name": "Content",
+          "example": "How do I configure my device?"
+        }
+      },
+      "x-go-package": "ai-chat-service-go/internal/models"
+    },
     "ErrorDetail": {
       "description": "ErrorDetail represents details about validation errors",
       "type": "object",
@@ -240,6 +394,101 @@
           "type": "string",
           "x-go-name": "Message",
           "example": "The request contains invalid parameters"
+        }
+      },
+      "x-go-package": "ai-chat-service-go/internal/models"
+    },
+    "Message": {
+      "description": "Message represents a message in a chat",
+      "type": "object",
+      "properties": {
+        "chatId": {
+          "description": "The ID of the chat this message belongs to",
+          "type": "string",
+          "x-go-name": "ChatID",
+          "example": "123e4567-e89b-12d3-a456-426614174000"
+        },
+        "content": {
+          "description": "The content of the message",
+          "type": "string",
+          "x-go-name": "Content",
+          "example": "How do I configure my device?"
+        },
+        "createdAt": {
+          "description": "When the message was created",
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "CreatedAt",
+          "example": "2023-07-15T14:32:21Z"
+        },
+        "id": {
+          "description": "The unique identifier for the message",
+          "type": "string",
+          "x-go-name": "ID",
+          "example": "123e4567-e89b-12d3-a456-426614174000"
+        },
+        "senderType": {
+          "description": "The type of sender (user, backend, or llm)\nuser SenderTypeUser  SenderTypeUser represents a message sent by the end user\nbackend SenderTypeBackend  SenderTypeBackend represents a message sent by the backend system\nllm SenderTypeLLM  SenderTypeLLM represents a message sent by the AI/LLM model",
+          "type": "string",
+          "enum": [
+            "user",
+            "backend",
+            "llm"
+          ],
+          "x-go-enum-desc": "user SenderTypeUser  SenderTypeUser represents a message sent by the end user\nbackend SenderTypeBackend  SenderTypeBackend represents a message sent by the backend system\nllm SenderTypeLLM  SenderTypeLLM represents a message sent by the AI/LLM model",
+          "x-go-name": "SenderType",
+          "example": "user"
+        },
+        "updatedAt": {
+          "description": "When the message was last updated",
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "UpdatedAt",
+          "example": "2023-07-15T14:32:21Z"
+        }
+      },
+      "x-go-package": "ai-chat-service-go/internal/models"
+    },
+    "MessageResponse": {
+      "description": "MessageResponse is the data transfer object for messages in API responses",
+      "type": "object",
+      "properties": {
+        "chatId": {
+          "description": "The ID of the chat this message belongs to",
+          "type": "string",
+          "x-go-name": "ChatID",
+          "example": "123e4567-e89b-12d3-a456-426614174000"
+        },
+        "content": {
+          "description": "The content of the message",
+          "type": "string",
+          "x-go-name": "Content",
+          "example": "How do I configure my device?"
+        },
+        "createdAt": {
+          "description": "When the message was created",
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "CreatedAt",
+          "example": "2023-07-15T14:32:21Z"
+        },
+        "id": {
+          "description": "The unique identifier for the message",
+          "type": "string",
+          "x-go-name": "ID",
+          "example": "123e4567-e89b-12d3-a456-426614174000"
+        },
+        "senderType": {
+          "description": "The type of sender (user, backend, or llm)\nuser SenderTypeUser  SenderTypeUser represents a message sent by the end user\nbackend SenderTypeBackend  SenderTypeBackend represents a message sent by the backend system\nllm SenderTypeLLM  SenderTypeLLM represents a message sent by the AI/LLM model",
+          "type": "string",
+          "enum": [
+            "user",
+            "backend",
+            "llm"
+          ],
+          "x-go-enum-desc": "user SenderTypeUser  SenderTypeUser represents a message sent by the end user\nbackend SenderTypeBackend  SenderTypeBackend represents a message sent by the backend system\nllm SenderTypeLLM  SenderTypeLLM represents a message sent by the AI/LLM model",
+          "x-go-name": "SenderType",
+          "example": "user"
         }
       },
       "x-go-package": "ai-chat-service-go/internal/models"

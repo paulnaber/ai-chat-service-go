@@ -10,30 +10,29 @@ Java...
 
 ## Features
 
-- Create and manage chat sessions
-- Send messages and receive AI-generated responses
-- Dockerized setup with docker-compose
-- ~~Authentication with OAuth2 Provider~~
-- ~~Downloadable OpenAPI definition (as json)~~
-- Easy local setup with Docker Compose
+-   Create and manage chat sessions
+-   Send messages and receive AI-generated responses
+-   Dockerized setup with docker-compose
+-   ~~Authentication with OAuth2 Provider~~
+-   ~~Downloadable OpenAPI definition (as json)~~
 
 ## Tech Stack
 
-- Goose - Database migrations
-- sqlc - Type-safe SQL queries
-- Docker Compose - Simplified local database setup
-- Fiber - Fast and minimalist web framework
-- go-swagger - OpenAPI generation from code documentation
-- Keycloak - Authentication, Authorization
+-   Goose - Database migrations
+-   sqlc - Type-safe SQL queries
+-   Docker Compose - Simplified local database setup
+-   Fiber - Fast and minimalist web framework
+-   go-swagger - OpenAPI generation from code documentation
+-   Keycloak - Authentication, Authorization
 
 ## Requirements
 
-- Go 1.20 or higher
-- Docker and Docker Compose (for local development)
-- Required tools (for development):
-  - Goose (database migrations)
-  - sqlc (SQL code generation)
-  - go-swagger (API documentation)
+-   Go 1.20 or higher
+-   Docker and Docker Compose (for local development)
+-   Required tools (for development):
+    -   Goose (database migrations)
+    -   sqlc (SQL code generation)
+    -   go-swagger (API documentation)
 
 ### Getting Started
 
@@ -144,8 +143,9 @@ http://localhost:3000/swagger/
 
 ### TODOs
 
-- better logging
-- prometheus
-- auth, including roles
-- /metrics endpoint
-- /openapi endpoints
+-   better logging
+-   prometheus
+-   auth, including roles
+-   /metrics endpoint
+-   /swagger and /openapi endpoints
+-   make swagger generation work
