@@ -22,7 +22,7 @@ Java...
 -   sqlc - Type-safe SQL queries
 -   Docker Compose - Simplified local database setup
 -   Fiber - Fast and minimalist web framework
--   go-swagger - OpenAPI generation from code documentation
+-   go-swagger - OpenAPI generation
 -   Keycloak - Authentication, Authorization
 
 ## Requirements
@@ -149,3 +149,6 @@ http://localhost:3000/swagger/
 -   /metrics endpoint
 -   /swagger and /openapi endpoints
 -   make swagger generation work
+-   oapi-codegen ausprobieren
+
+oapi-codegen -generate types,fiber -o ./internal/generated/paultest.gen.go -package paultest ./api-yml-start.yml

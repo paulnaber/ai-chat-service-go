@@ -1,4 +1,4 @@
-package api
+package api_old
 
 import (
 	"time"
@@ -12,16 +12,16 @@ import (
 	"ai-chat-service-go/internal/services"
 )
 
-type ChatHandler struct {
+type MessageHandler struct {
 	store *database.Queries
 }
 
-func NewChatHandler(store *database.Queries) *ChatHandler {
-	return &ChatHandler{store: store}
+func NewMessageHandler(store *database.Queries) *MessageHandler {
+	return &MessageHandler{store: store}
 }
 
-func (h *ChatHandler) CreateChat(c *fiber.Ctx) error {
-	var req models.CreateChatRequest
+func (h *MessageHandler) CreateMessage(c *fiber.Ctx) error {
+	var req models.CreateMessageRequest
 	if err := c.BodyParser(&req); err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, "Invalid request body")
 	}
@@ -32,22 +32,23 @@ func (h *ChatHandler) CreateChat(c *fiber.Ctx) error {
 	// }
 	user := middleware.MockUserInfo("paul.naber@gmail.com", []string{"admin"})
 
-	chatID := uuid.New()
-	now := time.Now().UTC()
-
-	chat, err := h.store.CreateChat(c.Context(), database.CreateChatParams{
-		ID:             chatID,
-		Title:          req.Content, // Use the first message as the title
-		UserEmail:      user.Email,
-		LastActiveDate: now,
-		CreatedAt:      now,
-		UpdatedAt:      now,
-	})
+	chatID, err := uuid.Parse(c.Params("chatId"))
 	if err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, "Failed to create chat")
+		return fiber.NewError(fiber.StatusBadRequest, "Invalid chat ID")
 	}
 
-	// Create the initial message
+	// Check if the chat belongs to the user
+	chat, err := h.store.GetChat(c.Context(), chatID)
+	if err != nil {
+		return fiber.NewError(fiber.StatusNotFound, "Chat not found")
+	}
+	if chat.UserEmail != user.Email {
+		return fiber.NewError(fiber.StatusForbidden, "You don't have access to this chat")
+	}
+
+	now := time.Now().UTC()
+
+	// Create user message
 	message, err := h.store.CreateMessage(c.Context(), database.CreateMessageParams{
 		ID:         uuid.New(),
 		Content:    req.Content,
@@ -57,7 +58,17 @@ func (h *ChatHandler) CreateChat(c *fiber.Ctx) error {
 		UpdatedAt:  now,
 	})
 	if err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, "Failed to create initial message")
+		return fiber.NewError(fiber.StatusInternalServerError, "Failed to create message")
+	}
+
+	// Update chat's last active date
+	err = h.store.UpdateChatLastActive(c.Context(), database.UpdateChatLastActiveParams{
+		ID:             chatID,
+		LastActiveDate: now,
+		UpdatedAt:      now,
+	})
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, "Failed to update chat")
 	}
 
 	// Generate AI response
@@ -79,13 +90,8 @@ func (h *ChatHandler) CreateChat(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusInternalServerError, "Failed to create AI response message")
 	}
 
-	response := models.ChatWithMessageResponse{
-		ChatResponse: models.ChatResponse{
-			ID:             chat.ID,
-			Title:          chat.Title,
-			LastActiveDate: chat.LastActiveDate,
-		},
-		InitialMessage: models.MessageResponse{
+	response := models.CreateMessageResponse{
+		UserMessage: models.MessageResponse{
 			ID:         message.ID,
 			Content:    message.Content,
 			SenderType: models.SenderType(message.SenderType),
@@ -104,24 +110,40 @@ func (h *ChatHandler) CreateChat(c *fiber.Ctx) error {
 	return c.JSON(response)
 }
 
-func (h *ChatHandler) GetChats(c *fiber.Ctx) error {
+func (h *MessageHandler) GetMessages(c *fiber.Ctx) error {
 	// user := middleware.GetCurrentUser(c)
 	// if user == nil {
 	// 	return fiber.NewError(fiber.StatusUnauthorized, "User not authenticated")
 	// }
 	user := middleware.MockUserInfo("paul.naber@gmail.com", []string{"admin"})
 
-	chats, err := h.store.GetChatsByUserEmail(c.Context(), user.Email)
+	chatID, err := uuid.Parse(c.Params("chatId"))
 	if err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, "Failed to fetch chats")
+		return fiber.NewError(fiber.StatusBadRequest, "Invalid chat ID")
 	}
 
-	var response []models.ChatResponse
-	for _, chat := range chats {
-		response = append(response, models.ChatResponse{
-			ID:             chat.ID,
-			Title:          chat.Title,
-			LastActiveDate: chat.LastActiveDate,
+	// Check if the chat belongs to the user
+	chat, err := h.store.GetChat(c.Context(), chatID)
+	if err != nil {
+		return fiber.NewError(fiber.StatusNotFound, "Chat not found")
+	}
+	if chat.UserEmail != user.Email {
+		return fiber.NewError(fiber.StatusForbidden, "You don't have access to this chat")
+	}
+
+	messages, err := h.store.GetMessagesByChatID(c.Context(), chatID)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, "Failed to fetch messages")
+	}
+
+	var response []models.MessageResponse
+	for _, msg := range messages {
+		response = append(response, models.MessageResponse{
+			ID:         msg.ID,
+			Content:    msg.Content,
+			SenderType: models.SenderType(msg.SenderType),
+			CreatedAt:  msg.CreatedAt,
+			ChatID:     msg.ChatID,
 		})
 	}
 

@@ -1,27 +1,3 @@
-// AI Chat Service API
-//
-// HTTP API for the AI Chat Service
-//
-//	Schemes: http, https
-//	Host: localhost:3000
-//	BasePath: /
-//	Version: 1.0.0
-//	License: MIT http://opensource.org/licenses/MIT
-//	Contact: API Support <support@example.com>
-//
-//	Consumes:
-//	- application/json
-//
-//	Produces:
-//	- application/json
-//
-//	SecurityDefinitions:
-//	  BearerAuth:
-//	    type: apiKey
-//	    in: header
-//	    name: Authorization
-//
-// swagger:meta
 package main
 
 import (
@@ -29,19 +5,22 @@ import (
 	"fmt"
 	"log"
 
+	_ "ai-chat-service-go/docs"
+	"ai-chat-service-go/internal/api"
+	"ai-chat-service-go/internal/config"
+	"ai-chat-service-go/internal/database"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/swagger"
 
-	_ "ai-chat-service-go/docs/swagger" // Import swagger docs
-	"ai-chat-service-go/internal/api"
-	"ai-chat-service-go/internal/config"
-	"ai-chat-service-go/internal/database"
-
 	_ "github.com/lib/pq"
 )
+
+// Implement the server interface
+type ChatServer struct{}
 
 func main() {
 	// Load configuration
@@ -56,6 +35,8 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error opening database: %s", err)
 	}
+
+	// connection is up, possible to do querries here
 	store := database.New(dbConn)
 
 	// Create a new Fiber app
@@ -72,8 +53,6 @@ func main() {
 		AllowMethods: "GET,POST,HEAD,PUT,DELETE,PATCH",
 		AllowHeaders: "Origin, Content-Type, Accept, Authorization",
 	}
-
-	// Handle AllowCredentials and AllowOrigins correctly
 	if cfg.CORS.AllowedOrigins == "*" {
 		corsConfig.AllowOrigins = "*"
 		corsConfig.AllowCredentials = false
@@ -81,7 +60,6 @@ func main() {
 		corsConfig.AllowOrigins = cfg.CORS.AllowedOrigins // Expected to be comma-separated
 		corsConfig.AllowCredentials = true
 	}
-
 	app.Use(cors.New(corsConfig))
 
 	// Setup Swagger

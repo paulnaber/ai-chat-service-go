@@ -1,19 +1,25 @@
-// Package docs provides Swagger documentation for the AI Chat API.
+// Package classification
 //
-// This package is imported for its side effects by main.go
-// to register Swagger documentation with the API server.
+// Documentation for this go project
+//
+//	Schemes: http
+//	BasePath: /
+//	Version: 1.0.0
+//	Host:
+//
+//	Consumes:
+//	- application/json
+//	- multipart/form-data
+//
+//	Produces:
+//	- application/json
+//
+//	Security:
+//	- basic
+//
+//	SecurityDefinitions:
+//	basic:
+//	  type: basic
+//
+// swagger:meta
 package docs
-
-// @title ΛI Chat API
-// @version 1.0
-// @description API for managing AI chat conversations
-// @termsOfService http://swagger.io/terms/
-// @contact.name API Support
-// @contact.email support@example.com
-// @license.name Apache 2.0
-// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
-// @host localhost:3000
-// @BasePath /
-// @securityDefinitions.apikey BearerAuth
-// @in header
-// @name Authorization
