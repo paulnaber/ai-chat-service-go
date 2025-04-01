@@ -63,9 +63,7 @@ sqlc generate
 4. Generate Swagger documentation:
 
 ```bash
-mkdir -p ./docs/swagger
 swagger generate spec -o ./docs/swagger/swagger.json --scan-models
-swagger serve -F=swagger ./docs/swagger/swagger.json
 ```
 
 5. Build the application:
@@ -142,7 +140,7 @@ docker compose down
 
 ### Swagger
 
-http://localhost:3000/swagger-ui/
+http://localhost:3000/swagger/
 
 ### TODOs
 
@@ -150,4 +148,4 @@ http://localhost:3000/swagger-ui/
 - prometheus
 - auth, including roles
 - /metrics endpoint
-- /swagger-ui and /openapi endpoints
+- /openapi endpoints
