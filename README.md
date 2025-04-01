@@ -5,172 +5,148 @@ The main focus of this project is the architecture. I want to compare it with ot
 
 ## Other Languages and Technologies
 
-[AI Chat Proxy Server - Node.js](https://github.com/paulnaber/ai-chat-service-nodejs)
+[AI Chat Proxy Server - Node.js](https://github.com/paulnaber/ai-chat-service-nodejs) <br>
 Java...
 
 ## Features
 
--   Create and manage chat sessions
--   Send messages and receive AI-generated responses
--   User authentication via OAuth2 with Keycloak
--   Swagger documentation (generated from code documentation)
--   Dockerized setup with docker-compose
-
-## Features
-
-• Supports chat and message operations
-• OpenAPI documentation generated from code documentation
-• ~~Authentication with OAuth2 Provider~~
-• ~~Downloadable OpenAPI definition (as json)~~
-• Easy local setup with Docker Compose
+- Create and manage chat sessions
+- Send messages and receive AI-generated responses
+- Dockerized setup with docker-compose
+- ~~Authentication with OAuth2 Provider~~
+- ~~Downloadable OpenAPI definition (as json)~~
+- Easy local setup with Docker Compose
 
 ## Tech Stack
 
-• Goose - Database migrations
-• sqlc - Type-safe SQL queries
-• Docker Compose - Simplified local database setup
-• Fiber - Fast and minimalist web framework
-• go-swagger - OpenAPI generation from code documentation
+- Goose - Database migrations
+- sqlc - Type-safe SQL queries
+- Docker Compose - Simplified local database setup
+- Fiber - Fast and minimalist web framework
+- go-swagger - OpenAPI generation from code documentation
+- Keycloak - Authentication, Authorization
 
 ## Requirements
 
--   Go 1.20 or higher
--   Docker and Docker Compose (for local development)
--   Required tools (for development):
-    -   Goose (database migrations)
-    -   sqlc (SQL code generation)
-    -   go-swagger (API documentation)
+- Go 1.20 or higher
+- Docker and Docker Compose (for local development)
+- Required tools (for development):
+  - Goose (database migrations)
+  - sqlc (SQL code generation)
+  - go-swagger (API documentation)
 
-## Getting Started
+### Getting Started
 
-### Clone the repository
+1. Before getting started, make sure to:
+
+```
+add .env file (see .env.example)
+have oauth2 provider up and running (docker compose)
+have postgres up and running (docker compose)
+have go installed on your machine
+```
+
+2. Install required tools:
 
 ```bash
-git clone https://github.com/yourusername/ai-chat-service-go.git
-cd ai-chat-service-go
+go install github.com/pressly/goose/v3/cmd/goose@latest
+go install github.com/go-swagger/go-swagger/cmd/swagger@latest
+go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
 ```
 
-### Configuration
-
-1. Copy the example environment file:
+3. Generate SQL code:
 
 ```bash
-cp .env.example .env
+sqlc generate
 ```
 
-2. Edit the `.env` file to match your environment
-
-### Running with Docker Compose
-
-The easiest way to get started is using Docker Compose, which will set up all the necessary services:
+4. Generate Swagger documentation:
 
 ```bash
-# Build and start all services
-make docker-build
-make docker-up
-
-# Stop the services
-make docker-down
+mkdir -p ./docs/swagger
+swagger generate spec -o ./docs/swagger/swagger.json --scan-models
+swagger serve -F=swagger ./docs/swagger/swagger.json
 ```
 
-### Running locally (without Docker)
-
-1. Make sure PostgreSQL is running and accessible
-2. Make sure Keycloak is running and configured
-3. Install required tools:
+5. Build the application:
 
 ```bash
-# Install development tools
-make tools
+go build -o bin/ai-chat-service-go .
 ```
 
-4. Run the database migrations:
+6. Start the application:
 
 ```bash
-make migrate-up
+./bin/ai-chat-service-go
 ```
 
-5. Generate SQL code from query files:
+for development, you can run:
 
 ```bash
-make sqlc
+go run .
 ```
-
-6. Generate Swagger documentation:
-
-```bash
-make swagger
-```
-
-7. Build and run the application:
-
-```bash
-make build
-make run
-```
-
-### Keycloak Setup (Manual)
-
-If you're not using Docker, you'll need to set up Keycloak manually:
-
-1. Create a new realm called `ai-chat`
-2. Create a new client called `ai-chat-client`
-3. Configure the client:
-    - Set access type to `confidential`
-    - Enable `Service Accounts`
-    - Add redirect URIs for your frontend
-4. Get the client secret from the Credentials tab
-5. Add the client secret to your `.env` file
-
-### API Documentation
-
-Swagger documentation is available at:
-
-```
-http://localhost:3000/swagger/
-```
-
-## Development
 
 ### Running Tests
 
+Run tests with:
+
 ```bash
-make test
+go test -v ./...
 ```
 
 ### Database Migrations
 
-Migrations are managed using Goose and stored as SQL files in the `migrations` directory.
+Create a new migration:
 
 ```bash
-# Create a new migration
-make migrate-create
-# Enter the migration name when prompted
-
-# Run migrations up
-make migrate-up
-
-# Roll back migrations
-make migrate-down
-
-# Check migration status
-make migrate-status
+read -p "Enter migration name: " name; goose -dir ./sql/schema create $name sql
 ```
 
-### SQL Queries
-
-SQL queries are stored in `sql/queries/` and used to generate Go code with sqlc.
+Run migrations up:
 
 ```bash
-# Generate SQL code
-make sqlc
+goose -dir ./sql/schema postgres postgres://postgres:postgres@localhost:5432/aichat up
 ```
 
-### Swagger Documentation
-
-API documentation is generated automatically from annotations in the code.
+Run migrations down:
 
 ```bash
-# Generate Swagger documentation
-make swagger
+goose -dir ./sql/schema postgres postgres://postgres:postgres@localhost:5432/aichat up
 ```
+
+Check migration status:
+
+```bash
+goose -dir ./sql/schema postgres postgres://postgres:postgres@localhost:5432/aichat status
+```
+
+### Docker
+
+Build Docker image:
+
+```bash
+docker build -t ai-chat-service-go .
+```
+
+Start Docker services:
+
+```bash
+docker compose up --build
+```
+
+Stop Docker services:
+
+```bash
+docker compose down
+```
+
+### Swagger
+
+http://localhost:3000/swagger-ui/
+
+### TODOs
+
+- better logging
+- prometheus
+- auth, including roles
+- metrics
