@@ -151,4 +151,4 @@ http://localhost:3000/swagger/
 -   make swagger generation work
 -   oapi-codegen ausprobieren
 
-oapi-codegen -generate types,fiber -o ./internal/generated/paultest.gen.go -package paultest ./api-yml-start.yml
+oapi-codegen -generate types,fiber -o ./internal/api/api.gen.go -package api ./api.yml

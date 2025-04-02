@@ -9,6 +9,7 @@ import (
 	"ai-chat-service-go/internal/api"
 	"ai-chat-service-go/internal/config"
 	"ai-chat-service-go/internal/database"
+	"ai-chat-service-go/internal/errors"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -37,11 +38,11 @@ func main() {
 	}
 
 	// connection is up, possible to do querries here
-	store := database.New(dbConn)
+	queries := database.New(dbConn)
 
 	// Create a new Fiber app
 	app := fiber.New(fiber.Config{
-		ErrorHandler: api.ErrorHandler,
+		ErrorHandler: errors.ErrorHandler,
 	})
 
 	// Setup middleware
@@ -69,7 +70,8 @@ func main() {
 	}))
 
 	// Setup routes
-	api.SetupRoutes(app, store, cfg)
+	chatServer := &api.ChatServer{Store: queries}
+	api.RegisterHandlers(app, chatServer)
 
 	// Start server
 	log.Printf("Starting server on port %s", cfg.Server.Port)

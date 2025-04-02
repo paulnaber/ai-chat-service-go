@@ -11,38 +11,38 @@ import (
 	"github.com/oapi-codegen/runtime"
 )
 
-// Defines values for ErrorCode.
+// Defines values for ErrorMessageCode.
 const (
-	FORBIDDEN        ErrorCode = "FORBIDDEN"
-	RESOURCENOTFOUND ErrorCode = "RESOURCE_NOT_FOUND"
-	SERVERERROR      ErrorCode = "SERVER_ERROR"
-	UNAUTHORIZED     ErrorCode = "UNAUTHORIZED"
-	VALIDATIONERROR  ErrorCode = "VALIDATION_ERROR"
+	FORBIDDEN        ErrorMessageCode = "FORBIDDEN"
+	RESOURCENOTFOUND ErrorMessageCode = "RESOURCE_NOT_FOUND"
+	SERVERERROR      ErrorMessageCode = "SERVER_ERROR"
+	UNAUTHORIZED     ErrorMessageCode = "UNAUTHORIZED"
+	VALIDATIONERROR  ErrorMessageCode = "VALIDATION_ERROR"
 )
 
-// Defines values for MessageDTOSenderType.
+// Defines values for SenderType.
 const (
-	Backend MessageDTOSenderType = "backend"
-	Llm     MessageDTOSenderType = "llm"
-	User    MessageDTOSenderType = "user"
+	BACKEND SenderType = "BACKEND"
+	LLM     SenderType = "LLM"
+	USER    SenderType = "USER"
 )
 
 // ChatDTO defines model for ChatDTO.
 type ChatDTO struct {
 	// Id Unique identifier for the chat (auto-generated)
-	Id *string `json:"id,omitempty"`
+	Id *int `json:"id,omitempty"`
 
 	// LastActiveDate Date when the chat was last active
-	LastActiveDate *time.Time `json:"lastActiveDate,omitempty"`
+	LastActiveDate *LocalDateTime `json:"lastActiveDate,omitempty"`
 
 	// Title Name of the chat (derived from first message)
 	Title *string `json:"title,omitempty"`
 }
 
-// Error defines model for Error.
-type Error struct {
+// ErrorMessage defines model for ErrorMessage.
+type ErrorMessage struct {
 	// Code Error code that identifies the error type
-	Code ErrorCode `json:"code"`
+	Code ErrorMessageCode `json:"code"`
 
 	// Details List of field-value pairs with additional error information
 	Details *[]struct {
@@ -57,29 +57,32 @@ type Error struct {
 	Message string `json:"message"`
 }
 
-// ErrorCode Error code that identifies the error type
-type ErrorCode string
+// ErrorMessageCode Error code that identifies the error type
+type ErrorMessageCode string
+
+// LocalDateTime defines model for LocalDateTime.
+type LocalDateTime = time.Time
 
 // MessageDTO defines model for MessageDTO.
 type MessageDTO struct {
 	// ChatId Reference to the chat this message belongs to (auto-generated)
-	ChatId *string `json:"chatId,omitempty"`
+	ChatId *int `json:"chatId,omitempty"`
 
 	// Content Content of the message
 	Content *string `json:"content,omitempty"`
 
 	// CreatedAt Date when the message was created (auto-generated)
-	CreatedAt *time.Time `json:"createdAt,omitempty"`
+	CreatedAt *LocalDateTime `json:"createdAt,omitempty"`
 
 	// Id Unique identifier for the message (auto-generated)
-	Id *string `json:"id,omitempty"`
+	Id *int `json:"id,omitempty"`
 
 	// SenderType Type of sender (automatically set to 'user' for user messages)
-	SenderType *MessageDTOSenderType `json:"senderType,omitempty"`
+	SenderType *SenderType `json:"senderType,omitempty"`
 }
 
-// MessageDTOSenderType Type of sender (automatically set to 'user' for user messages)
-type MessageDTOSenderType string
+// SenderType Type of sender (automatically set to 'user' for user messages)
+type SenderType string
 
 // CreateChatJSONBody defines parameters for CreateChat.
 type CreateChatJSONBody struct {
@@ -109,10 +112,10 @@ type ServerInterface interface {
 	CreateChat(c *fiber.Ctx) error
 	// Get all messages for a chat
 	// (GET /v1/chats/{chatId}/messages)
-	GetMessages(c *fiber.Ctx, chatId string) error
+	GetMessages(c *fiber.Ctx, chatId int) error
 	// Create a new message
 	// (POST /v1/chats/{chatId}/messages)
-	CreateMessage(c *fiber.Ctx, chatId string) error
+	CreateMessage(c *fiber.Ctx, chatId int) error
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -140,7 +143,7 @@ func (siw *ServerInterfaceWrapper) GetMessages(c *fiber.Ctx) error {
 	var err error
 
 	// ------------- Path parameter "chatId" -------------
-	var chatId string
+	var chatId int
 
 	err = runtime.BindStyledParameterWithOptions("simple", "chatId", c.Params("chatId"), &chatId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
 	if err != nil {
@@ -156,7 +159,7 @@ func (siw *ServerInterfaceWrapper) CreateMessage(c *fiber.Ctx) error {
 	var err error
 
 	// ------------- Path parameter "chatId" -------------
-	var chatId string
+	var chatId int
 
 	err = runtime.BindStyledParameterWithOptions("simple", "chatId", c.Params("chatId"), &chatId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
 	if err != nil {

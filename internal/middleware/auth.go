@@ -13,7 +13,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 
 	"ai-chat-service-go/internal/config"
-	"ai-chat-service-go/internal/models"
+	"ai-chat-service-go/internal/errors"
 )
 
 type userContextKey string
@@ -60,12 +60,12 @@ func Auth(cfg config.AuthConfig) fiber.Handler {
 		// Get the Authorization header
 		authHeader := c.Get("Authorization")
 		if authHeader == "" {
-			return c.Status(http.StatusUnauthorized).JSON(models.NewUnauthorizedError("Missing authorization header"))
+			return c.Status(http.StatusUnauthorized).JSON(errors.NewUnauthorizedError("Missing authorization header"))
 		}
 
 		// Check if it's a Bearer token
 		if !strings.HasPrefix(authHeader, "Bearer ") {
-			return c.Status(http.StatusUnauthorized).JSON(models.NewUnauthorizedError("Invalid authorization header format"))
+			return c.Status(http.StatusUnauthorized).JSON(errors.NewUnauthorizedError("Invalid authorization header format"))
 		}
 
 		// Extract the token
@@ -74,7 +74,7 @@ func Auth(cfg config.AuthConfig) fiber.Handler {
 		// Parse and validate the token
 		userInfo, err := validateToken(tokenString, cfg)
 		if err != nil {
-			return c.Status(http.StatusUnauthorized).JSON(models.NewUnauthorizedError(fmt.Sprintf("Invalid token: %v", err)))
+			return c.Status(http.StatusUnauthorized).JSON(errors.NewUnauthorizedError(fmt.Sprintf("Invalid token: %v", err)))
 		}
 
 		// Store user information in context
@@ -181,7 +181,7 @@ func RequireRoles(roles ...string) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		user := GetCurrentUser(c)
 		if user == nil {
-			return c.Status(http.StatusUnauthorized).JSON(models.NewUnauthorizedError(""))
+			return c.Status(http.StatusUnauthorized).JSON(errors.NewUnauthorizedError(""))
 		}
 
 		// Check if the user has any of the required roles
@@ -199,7 +199,7 @@ func RequireRoles(roles ...string) fiber.Handler {
 		}
 
 		if !hasRole {
-			return c.Status(http.StatusForbidden).JSON(models.NewForbiddenError(""))
+			return c.Status(http.StatusForbidden).JSON(errors.NewForbiddenError(""))
 		}
 
 		return c.Next()

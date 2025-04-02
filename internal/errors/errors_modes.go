@@ -1,4 +1,4 @@
-package models
+package errors
 
 // ErrorCode represents error types returned by the API
 // swagger:enum ErrorCode
@@ -23,7 +23,7 @@ type ErrorDetail struct {
 	// The name of the field with an error
 	// example: content
 	Field string `json:"field"`
-	
+
 	// The error message or problematic value for this field
 	// example: Content cannot be empty
 	Value string `json:"value"`
@@ -35,11 +35,11 @@ type ErrorResponse struct {
 	// Error code that identifies the error type
 	// example: VALIDATION_ERROR
 	Code ErrorCode `json:"code"`
-	
+
 	// Human-readable error description
 	// example: The request contains invalid parameters
 	Message string `json:"message"`
-	
+
 	// List of field-value pairs with additional error information
 	Details []ErrorDetail `json:"details,omitempty"`
 }

@@ -1,12 +1,10 @@
-package api_old
+package errors
 
 import (
 	"errors"
 	"log"
 
 	"github.com/gofiber/fiber/v2"
-
-	"ai-chat-service-go/internal/models"
 )
 
 // ErrorHandler is a custom Fiber error handler
@@ -21,20 +19,20 @@ func ErrorHandler(c *fiber.Ctx, err error) error {
 	}
 
 	// Handle specific errors with appropriate status codes
-	var response models.ErrorResponse
+	var response ErrorResponse
 	switch code {
 	case fiber.StatusBadRequest:
-		response = models.NewValidationError(err.Error())
+		response = NewValidationError(err.Error())
 	case fiber.StatusUnauthorized:
-		response = models.NewUnauthorizedError(err.Error())
+		response = NewUnauthorizedError(err.Error())
 	case fiber.StatusForbidden:
-		response = models.NewForbiddenError(err.Error())
+		response = NewForbiddenError(err.Error())
 	case fiber.StatusNotFound:
-		response = models.NewResourceNotFoundError(err.Error())
+		response = NewResourceNotFoundError(err.Error())
 	default:
 		// Log unexpected errors
 		log.Printf("Unexpected error: %v", err)
-		response = models.NewServerError("An unexpected error occurred")
+		response = NewServerError("An unexpected error occurred")
 	}
 
 	// Set the content type and return the error

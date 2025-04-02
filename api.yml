@@ -1,6 +1,10 @@
 openapi: 3.0.3
 info:
-  title: ɅI API
+  title: M2MDevice Gate ɅI API
+  contact:
+    name: INSIDE M2M
+    url: https://inside-m2m.de
+    email: info@inside-m2m.de
   version: "1.0"
 tags:
   - name: Chats
@@ -46,21 +50,21 @@ paths:
               examples:
                 chat-created:
                   value:
-                    id: "1"
+                    id: 1,
                     title: "How do I configure my device?"
                     lastActiveDate: "2023-07-15T14:32:21Z"
                     initialMessage:
-                      id: "1"
+                      id: 1
                       content: "How do I configure my device?"
                       senderType: "user"
                       createdAt: "2023-07-15T14:32:21Z"
-                      chatId: "1"
+                      chatId: 1
         "400":
           description: Bad request - invalid input parameters
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: "#/components/schemas/ErrorMessage"
               examples:
                 validation-error:
                   value:
@@ -74,7 +78,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: "#/components/schemas/ErrorMessage"
               examples:
                 unauthorized:
                   value:
@@ -85,7 +89,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: "#/components/schemas/ErrorMessage"
               examples:
                 server-error:
                   value:
@@ -109,10 +113,10 @@ paths:
               examples:
                 user-chats:
                   value:
-                    - id: "1"
+                    - id: 1
                       title: "How do I configure my device?"
                       lastActiveDate: "2023-07-15T14:32:21Z"
-                    - id: "2"
+                    - id: 2
                       title: "Is there a way to update the firmware remotely?"
                       lastActiveDate: "2023-07-10T09:15:33Z"
         "401":
@@ -120,7 +124,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: "#/components/schemas/ErrorMessage"
               examples:
                 unauthorized:
                   value:
@@ -131,7 +135,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: "#/components/schemas/ErrorMessage"
               examples:
                 server-error:
                   value:
@@ -149,7 +153,7 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
           description: ID of the chat this message belongs to
       requestBody:
         required: true
@@ -180,17 +184,17 @@ paths:
               examples:
                 ai-response:
                   value:
-                    id: "3"
+                    id: 3,
                     content: "To configure your device, please follow these steps: 1. Connect to the admin panel using the IP address 192.168.1.1. 2. Login with your administrator credentials. 3. Navigate to the 'Settings' tab. 4. Adjust your configuration as needed."
                     senderType: "llm"
                     createdAt: "2023-07-15T14:35:42Z"
-                    chatId: "1"
+                    chatId: 1
         "400":
           description: Bad request - invalid input parameters
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: "#/components/schemas/ErrorMessage"
               examples:
                 validation-error:
                   value:
@@ -204,7 +208,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: "#/components/schemas/ErrorMessage"
               examples:
                 unauthorized:
                   value:
@@ -215,7 +219,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: "#/components/schemas/ErrorMessage"
               examples:
                 forbidden:
                   value:
@@ -226,8 +230,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
-              examples:
+                $ref: "#/components/schemas/ErrorMessage"
                 chat-not-found:
                   value:
                     code: "RESOURCE_NOT_FOUND"
@@ -240,7 +243,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: "#/components/schemas/ErrorMessage"
               examples:
                 server-error:
                   value:
@@ -257,7 +260,7 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
           description: ID of the chat whose messages to retrieve
       responses:
         "200":
@@ -271,27 +274,27 @@ paths:
               examples:
                 chat-messages:
                   value:
-                    - id: "1"
+                    - id: 1
                       content: "How do I configure my device?"
                       senderType: "user"
                       createdAt: "2023-07-15T14:32:21Z"
-                      chatId: "1"
-                    - id: "2"
+                      chatId: 1
+                    - id: 2
                       content: "To configure your device, please follow these steps: 1. Connect to the admin panel using the IP address 192.168.1.1. 2. Login with your administrator credentials. 3. Navigate to the 'Settings' tab. 4. Adjust your configuration as needed."
                       senderType: "llm"
                       createdAt: "2023-07-15T14:35:42Z"
-                      chatId: "1"
-                    - id: "3"
+                      chatId: 2
+                    - id: 3
                       content: "Thank you for the information. Where can I find my administrator credentials?"
                       senderType: "user"
                       createdAt: "2023-07-15T14:40:15Z"
-                      chatId: "1"
+                      chatId: 1
         "400":
           description: Bad request - invalid chat ID
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: "#/components/schemas/ErrorMessage"
               examples:
                 validation-error:
                   value:
@@ -305,7 +308,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: "#/components/schemas/ErrorMessage"
               examples:
                 unauthorized:
                   value:
@@ -316,7 +319,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: "#/components/schemas/ErrorMessage"
               examples:
                 forbidden:
                   value:
@@ -327,7 +330,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: "#/components/schemas/ErrorMessage"
               examples:
                 chat-not-found:
                   value:
@@ -341,7 +344,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: "#/components/schemas/ErrorMessage"
               examples:
                 server-error:
                   value:
@@ -353,36 +356,40 @@ components:
       type: object
       properties:
         id:
-          type: string
+          type: integer
           description: Unique identifier for the chat (auto-generated)
         title:
           type: string
           description: Name of the chat (derived from first message)
         lastActiveDate:
           type: string
-          format: date-time
+          allOf:
+            - $ref: "#/components/schemas/LocalDateTime"
           description: Date when the chat was last active
     MessageDTO:
       type: object
       properties:
         id:
-          type: string
+          type: integer
           description: Unique identifier for the message (auto-generated)
         content:
           type: string
           description: Content of the message
         senderType:
+          default: USER
           type: string
-          enum: [user, backend, llm]
+          allOf:
+            - $ref: "#/components/schemas/SenderType"
           description: Type of sender (automatically set to 'user' for user messages)
         createdAt:
           type: string
-          format: date-time
+          allOf:
+            - $ref: "#/components/schemas/LocalDateTime"
           description: Date when the message was created (auto-generated)
         chatId:
-          type: string
+          type: integer
           description: Reference to the chat this message belongs to (auto-generated)
-    Error:
+    ErrorMessage:
       type: object
       required:
         - code
@@ -412,3 +419,14 @@ components:
               value:
                 type: string
                 description: The error message or problematic value for this field
+    SenderType:
+      enum:
+        - USER
+        - BACKEND
+        - LLM
+      type: string
+      description: Type of sender (automatically set to 'user' for user messages)
+    LocalDateTime:
+      format: date-time
+      type: string
+      example: 2022-03-10T12:15:50
