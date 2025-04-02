@@ -8,21 +8,13 @@ The main focus of this project is the architecture. I want to compare it with ot
 [AI Chat Proxy Server - Node.js](https://github.com/paulnaber/ai-chat-service-nodejs) <br>
 Java...
 
-## Features
-
--   Create and manage chat sessions
--   Send messages and receive AI-generated responses
--   Dockerized setup with docker-compose
--   ~~Authentication with OAuth2 Provider~~
--   ~~Downloadable OpenAPI definition (as json)~~
-
 ## Tech Stack
 
 -   Goose - Database migrations
 -   sqlc - Type-safe SQL queries
 -   Docker Compose - Simplified local database setup
 -   Fiber - Fast and minimalist web framework
--   go-swagger - OpenAPI generation
+-   oapi-codegen - Structs and Routes generated from OpenAPI spec
 -   Keycloak - Authentication, Authorization
 
 ## Requirements
@@ -32,7 +24,6 @@ Java...
 -   Required tools (for development):
     -   Goose (database migrations)
     -   sqlc (SQL code generation)
-    -   go-swagger (API documentation)
 
 ### Getting Started
 
@@ -59,10 +50,10 @@ go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
 sqlc generate
 ```
 
-4. Generate Swagger documentation:
+4. Generate Structs and Routes from OpenAPI spec:
 
 ```bash
-swagger generate spec -o ./docs/swagger/swagger.json --scan-models
+oapi-codegen -generate types,fiber -o ./internal/api/api.gen.go -package api ./api.yml
 ```
 
 5. Build the application:
@@ -140,15 +131,12 @@ docker compose down
 ### Swagger
 
 http://localhost:3000/swagger/
+http://localhost:3000/api.yml
 
 ### TODOs
 
+-   implementation of endpoints
 -   better logging
 -   prometheus
 -   auth, including roles
 -   /metrics endpoint
--   /swagger and /openapi endpoints
--   make swagger generation work
--   oapi-codegen ausprobieren
-
-oapi-codegen -generate types,fiber -o ./internal/api/api.gen.go -package api ./api.yml

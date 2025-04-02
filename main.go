@@ -63,10 +63,12 @@ func main() {
 	}
 	app.Use(cors.New(corsConfig))
 
-	// Setup Swagger
+	// serving the static file is needed in order to serve the Swagger UI
+	app.Static("/api.yml", "./api.yml") // Serve your api.yml file here
+
+	// Serve the Swagger UI at '/swagger' and point it to '/api.yml'
 	app.Get("/swagger/*", swagger.New(swagger.Config{
-		URL:         "/swagger/doc.json",
-		DeepLinking: true,
+		URL: "/api.yml",
 	}))
 
 	// Setup routes
